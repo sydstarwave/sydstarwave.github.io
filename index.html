@@ -16,7 +16,6 @@
     <meta property="og:title" content="Where in the 'verse is @sydstarwave?">
     <meta property="og:description" content="Here you can find Sydstarwave's official links to Twitch, Youtube, Twitter, Facebook, and Instagram! Everything is all in one place for convenience :)">
     <meta property="og:image" content="https://sydstarwave.github.io/images/screenshot.jpg">
-
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta property="twitter:domain" content="sydstarwave.github.io">
@@ -65,5 +64,49 @@
         </a>
       </div>
     </main>
+	<div id="webamp" style="height: 100vh"></div>
+    <script src="https://unpkg.com/webamp@1.4.2/built/webamp.bundle.min.js"></script>
+    <script>
+	
+	window.onload = function() {
+		var url = "https://yt1s.sydstarwave.workers.dev/?v=U3YZTYXftzg";
+		var urlReq = new XMLHttpRequest();
+		urlReq.open('GET', url, true); 
+		urlReq.responseType = 'json'; //the response is json
+		urlReq.onload = function() {
+			var audioURL = "https://cors-proxy.sydstarwave.workers.dev/yeet/" + encodeURIComponent(urlReq.response.url);
+			initWebamp(audioURL);
+		}
+		urlReq.send();
+	}
+	
+	function initWebamp(track) {
+		const Webamp = window.Webamp;
+        const webamp = new Webamp({
+            initialTracks: [
+                {
+                    metaData: {
+                        artist: "M83",
+                        title: "Go! feat Mai Lan"
+                    },
+                    url: track,
+                    duration: 235
+                },
+				{
+                    metaData: {
+                        artist: "DJ Mike Llama",
+                        title: "Llama Whippin' Intro"
+                    },
+                    url: "https://cdn.jsdelivr.net/gh/captbaritone/webamp@43434d82cfe0e37286dbbe0666072dc3190a83bc/mp3/llama-2.91.mp3",
+                    duration: 5.322286
+                }
+            ],
+        });
+
+        // Returns a promise indicating when it's done loading.
+        webamp.renderWhenReady(document.getElementById('webamp'));
+	}
+	
+  </script>
   </body>
 </html>
