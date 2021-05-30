@@ -6,23 +6,23 @@
     <link rel="stylesheet" href="style.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="sydstarwave's quick access links">
-    <meta name="image" content="https://sydstarwave.github.io/images/screenshot.jpg">
+    <meta name="image" content="https://sydstarwave.neocities.org/images/screenshot.jpg">
     <meta itemprop="name" content="Sydney - @sydstarwave">
     <meta itemprop="description" content="sydstarwave's quick access links">
-    <meta itemprop="image" content="https://sydstarwave.github.io/images/screenshot.jpg">
+    <meta itemprop="image" content="https://sydstarwave.neocities.org/images/screenshot.jpg">
     <!-- Facebook Meta Tags -->
-    <meta property="og:url" content="https://sydstarwave.github.io/">
+    <meta property="og:url" content="https://sydstarwave.neocities.org/">
     <meta property="og:type" content="website">
     <meta property="og:title" content="Where in the 'verse is @sydstarwave?">
     <meta property="og:description" content="Here you can find Sydstarwave's official links to Twitch, Youtube, Twitter, Facebook, and Instagram! Everything is all in one place for convenience :)">
-    <meta property="og:image" content="https://sydstarwave.github.io/images/screenshot.jpg">
+    <meta property="og:image" content="https://sydstarwave.neocities.org/images/screenshot.jpg">
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta property="twitter:domain" content="sydstarwave.github.io">
-    <meta property="twitter:url" content="https://sydstarwave.github.io/">
+    <meta property="twitter:url" content="https://sydstarwave.neocities.org/">
     <meta name="twitter:title" content="Where in the 'verse is @sydstarwave?">
     <meta name="twitter:description" content="Here you can find Sydstarwave's official links to Twitch, Youtube, Twitter, Facebook, and Instagram! Everything is all in one place for convenience :)">
-    <meta name="twitter:image" content="https://sydstarwave.github.io/images/screenshot.jpg">
+    <meta name="twitter:image" content="https://sydstarwave.neocities.org/images/screenshot.jpg">
   </head>
   <body>
     <video autoplay muted loop>
@@ -67,44 +67,72 @@
 	<div id="webamp" style="height: 100vh"></div>
     <script src="https://unpkg.com/webamp@1.4.2/built/webamp.bundle.min.js"></script>
     <script>
+	const Webamp = window.Webamp;
+	const webamp = new Webamp({
+		initialTracks: [{
+			metaData: {
+				artist: "DJ Mike Llama",
+				title: "Llama Whippin' Intro"
+			},
+			url: "https://cdn.jsdelivr.net/gh/captbaritone/webamp@43434d82cfe0e37286dbbe0666072dc3190a83bc/mp3/llama-2.91.mp3",
+			duration: 5.322286
+		}]
+	});
 	
 	window.onload = function() {
-		var url = "https://yt1s.sydstarwave.workers.dev/?v=U3YZTYXftzg";
-		var urlReq = new XMLHttpRequest();
-		urlReq.open('GET', url, true); 
-		urlReq.responseType = 'json'; //the response is json
+		webamp.renderWhenReady(document.getElementById('webamp'));
+		
+		let url = "https://yt1s.sydstarwave.workers.dev/?v=U3YZTYXftzg";
+		let urlReq = new XMLHttpRequest();
+		urlReq.open('GET', url, false);
 		urlReq.onload = function() {
-			var audioURL = "https://cors-proxy.sydstarwave.workers.dev/yeet/" + encodeURIComponent(urlReq.response.url);
-			initWebamp(audioURL);
+			let response = JSON.parse(urlReq.responseText);
+			let audioURL = "https://cors-proxy.sydstarwave.workers.dev/yeet/" + encodeURIComponent(response.url);
+			webamp.appendTracks([{
+				metaData: {
+					artist: "M83",
+					title: "Go! feat Mai Lan"
+				},
+				url: audioURL,
+				duration: 235
+			}]);
 		}
 		urlReq.send();
-	}
-	
-	function initWebamp(track) {
-		const Webamp = window.Webamp;
-        const webamp = new Webamp({
-            initialTracks: [
-                {
-                    metaData: {
-                        artist: "M83",
-                        title: "Go! feat Mai Lan"
-                    },
-                    url: track,
-                    duration: 235
-                },
-				{
-                    metaData: {
-                        artist: "DJ Mike Llama",
-                        title: "Llama Whippin' Intro"
-                    },
-                    url: "https://cdn.jsdelivr.net/gh/captbaritone/webamp@43434d82cfe0e37286dbbe0666072dc3190a83bc/mp3/llama-2.91.mp3",
-                    duration: 5.322286
-                }
-            ],
-        });
-
-        // Returns a promise indicating when it's done loading.
-        webamp.renderWhenReady(document.getElementById('webamp'));
+		
+		let url2 = "https://bandcamp-cors-proxy.sydstarwave.workers.dev/?album=97966519";
+		let urlReq2 = new XMLHttpRequest();
+		urlReq2.open('GET', url2, true); 
+		urlReq2.responseType = 'json';
+		urlReq2.onload = function() {
+			let response = urlReq2.response;
+			if (urlReq2.status >= 300) {
+				return;
+			}
+			let tracks = [];
+			for (let i = 0; i < response.tracks.length; i++) {
+				if (response.tracks[i].tracknum === 2) {
+					webamp.appendTracks([{
+						metaData: {
+							artist: response.tracks[2].artist,
+							title: response.tracks[2].title
+						},
+						url: "https://cors-proxy.sydstarwave.workers.dev/yeet/" + encodeURIComponent(response.tracks[2].file["mp3-128"]),
+						duration: response.tracks[2].duration
+					}]);
+				} else {
+					tracks.push({
+						metaData: {
+							artist: response.tracks[i].artist,
+							title: response.tracks[i].title
+						},
+						url: "https://cors-proxy.sydstarwave.workers.dev/yeet/" + encodeURIComponent(response.tracks[i].file["mp3-128"]),
+						duration: response.tracks[i].duration
+					});
+				}
+			}
+			webamp.appendTracks(tracks);
+		}
+		urlReq2.send();
 	}
 	
   </script>

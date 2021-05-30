@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>You are being yeeted</title>
+    <style>
+    body {
+      background-color: #888;
+      font-family: Ariel, sans-serif;
+    }
+    </style>
+    <script>
+    const memes = [
+      "https://youtu.be/dEcTdl9AspE",
+      "https://youtu.be/SBxpeuxUiOA",
+      "https://youtu.be/BzvtnMNaCZQ?t=22",
+      "https://youtu.be/WSr1Yj96MEs",
+      "https://youtu.be/4feUSTS21-8",
+      "https://youtu.be/pxIofYrt0kE",
+      "https://youtu.be/_JoWeUxHFPs",
+      "https://youtu.be/A7UphI0SJLo",
+      "https://youtu.be/ml17lE5j4cQ"
+    ];
+    const randomMeme = memes[Math.floor(Math.random() * memes.length)];
+    window.location = randomMeme;
+    document.querySelector("#yeet").href = randomMeme;
+    </script>
+  </head>
+  <h1><a id="yeet">Please yeet yourself at your earliest convenience</a></h1>
+</html>
