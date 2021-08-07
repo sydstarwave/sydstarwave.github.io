@@ -6,27 +6,27 @@
     <link rel="stylesheet" href="style.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="sydstarwave's quick access links">
-    <meta name="image" content="https://sydstarwave.github.io/images/screenshot.jpg">
+    <meta name="image" content="https://sydstarwave.gq/images/screenshot.jpg">
     <meta itemprop="name" content="Sydney - @sydstarwave">
     <meta itemprop="description" content="sydstarwave's quick access links">
-    <meta itemprop="image" content="https://sydstarwave.github.io/images/screenshot.jpg">
+    <meta itemprop="image" content="https://sydstarwave.gq/images/screenshot.jpg">
     <!-- Facebook Meta Tags -->
-    <meta property="og:url" content="https://sydstarwave.github.io/">
+    <meta property="og:url" content="https://sydstarwave.gq/">
     <meta property="og:type" content="website">
     <meta property="og:title" content="Where in the 'verse is @sydstarwave?">
     <meta property="og:description" content="Here you can find Sydstarwave's official links to Twitch, Youtube, Twitter, Facebook, and Instagram! Everything is all in one place for convenience :)">
-    <meta property="og:image" content="https://sydstarwave.github.io/images/screenshot.jpg">
+    <meta property="og:image" content="https://sydstarwave.gq/images/screenshot.jpg">
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta property="twitter:domain" content="sydstarwave.github.io">
-    <meta property="twitter:url" content="https://sydstarwave.github.io/">
+    <meta property="twitter:url" content="https://sydstarwave.gq/">
     <meta name="twitter:title" content="Where in the 'verse is @sydstarwave?">
     <meta name="twitter:description" content="Here you can find Sydstarwave's official links to Twitch, Youtube, Twitter, Facebook, and Instagram! Everything is all in one place for convenience :)">
-    <meta name="twitter:image" content="https://sydstarwave.github.io/images/screenshot.jpg">
+    <meta name="twitter:image" content="https://sydstarwave.gq/images/screenshot.jpg">
   </head>
   <body>
     <video autoplay muted loop>
-      <source src="https://sydstarwave.github.io/images/bg.webm" type="video/webm">
+      <source src="https://sydstarwave.gq/images/bg.webm" type="video/webm">
     </video>
     <main>
       <img src="/images/profile-image.png" alt="Sydstarwave's Profile Pic" />
@@ -71,10 +71,14 @@
     </main>
 	<div id="webamp" style="height: 100vh"></div>
     <script src="https://unpkg.com/webamp@1.4.2/built/webamp.bundle.min.js"></script>
+	<script src="https://unpkg.com/butterchurn@2.6.7/lib/butterchurn.min.js"></script>
+    <script src="https://unpkg.com/butterchurn-presets@2.4.7/lib/butterchurnPresets.min.js"></script>
+	<script src="https://unpkg.com/butterchurn-presets@2.4.7/lib/butterchurnPresetsExtra.min.js"></script>
+	<script src="https://unpkg.com/butterchurn-presets@2.4.7/lib/butterchurnPresetsExtra2.min.js"></script>
+	<script src="https://unpkg.com/butterchurn-presets@2.4.7/lib/butterchurnPresetsMD1.min.js"></script>
 	<!-- You made it this far, you deserve a prize - /yeet/ -->
     <script>
-	const Webamp = window.Webamp;
-	const webamp = new Webamp({
+	const webamp = new window.Webamp({
 		initialTracks: [{
 			metaData: {
 				artist: "DJ Mike Llama",
@@ -82,59 +86,145 @@
 			},
 			url: "https://cdn.jsdelivr.net/gh/captbaritone/webamp@43434d82cfe0e37286dbbe0666072dc3190a83bc/mp3/llama-2.91.mp3",
 			duration: 5.322286
-		}]
+		}],
+		__butterchurnOptions: {
+			importButterchurn: () => Promise.resolve(window.butterchurn),
+			getPresets: () => {
+				const presets = window.butterchurnPresets.getPresets();
+				return Object.keys(presets).map((name) => {
+					return {
+						name,
+						butterchurnPresetObject: presets[name]
+					};
+				});
+			},
+			butterchurnOpen: true
+		},
+		__initialWindowLayout: {
+			main: { position: { x: 0, y: 0 } },
+			equalizer: { position: { x: 0, y: 116 } },
+			playlist: { position: { x: 0, y: 232 }, size: [0, 4] },
+			milkdrop: { position: { x: 1150, y: 0 }, size: [7, 12] }
+		}
 	});
 	
-	window.onload = function() {
-		webamp.renderWhenReady(document.getElementById('webamp'));
-		
-		let url = "https://yt1s.sydstarwave.workers.dev/?v=U3YZTYXftzg";
-		let urlReq = new XMLHttpRequest();
-		urlReq.open('GET', url, false);
-		urlReq.onload = function() {
-			let response = JSON.parse(urlReq.responseText);
-			let audioURL = "https://cors-proxy.sydstarwave.workers.dev/yeet/" + encodeURIComponent(response.url);
+	const fetchBandcampAlbum = function (album) {
+		return fetch("https://bandcamp-cors-proxy.sydstarwave.workers.dev/?album=" + album)
+			.then(response => response.json());
+	}
+	
+	const makeBandcampTrack = function (track) {
+		return {
+			metaData: {
+				artist: track.artist,
+				title: track.title
+			},
+			url: "https://cors-proxy.sydstarwave.workers.dev/yeet/" + encodeURIComponent(track.file["mp3-128"]),
+			duration: track.duration
+		};
+	};
+	
+	const getBandcampTrack = function (list, id) {
+		for (let i = 0; i < list.tracks.length; i++) {
+			if (list.tracks[i].tracknum === id) {
+				return [makeBandcampTrack(list.tracks[i])];
+			}
+		}
+	}
+	
+	const getBandcampTracks = function (list) {
+		let tracks = [];
+		for (let i = 0; i < list.tracks.length; i++) {
+			tracks[i] = makeBandcampTrack(list.tracks[i])
+		}
+		return tracks;
+	}
+	
+	const fetchYouTubeTrack = function (id) {
+		return fetch("https://yt1s.sydstarwave.workers.dev/?v=" + id)
+			.then(response => response.json())
+			.then(response => "https://cors-proxy.sydstarwave.workers.dev/yeet/" + encodeURIComponent(response.url));
+	}
+	
+	const danMason = function() {
+		return fetchBandcampAlbum(97966519)
+			.then(response => {
+				let tracks = getBandcampTracks(response);
+				webamp.appendTracks(tracks.splice(2, 1));
+				webamp.appendTracks(tracks);
+			});
+	}
+	
+	const radiojpn = function() {
+		return fetchBandcampAlbum(3673738609)
+			.then(response => webamp.appendTracks(getBandcampTrack(response, 4)));
+	};
+	
+	const startup = function() {
+		return fetchBandcampAlbum(760607385)
+			.then(response => webamp.appendTracks(getBandcampTrack(response, 0)));
+	};
+	
+	const vektroid_floral_shoppe_420 = function() {
+		return fetchBandcampAlbum(571360365)
+			.then(response => webamp.appendTracks(getBandcampTrack(response, 1)));
+	};
+	
+	const m83_junk_do_it_try_it = function() {
+		return fetchYouTubeTrack("ryh9rkIRGUs")
+			.then(audioURL => {
+				webamp.appendTracks([{
+					metaData: {
+						artist: "M83",
+						title: "Do It, Try It",
+						album: "Junk"
+					},
+					url: audioURL,
+					duration: 217
+				}]);
+			});
+	};
+	
+	const m83_junk_go = function() {
+		return fetchYouTubeTrack("U3YZTYXftzg")
+			.then(audioURL => {
+				webamp.appendTracks([{
+					metaData: {
+						artist: "M83",
+						title: "Go! feat. Mai Lan",
+						album: "Junk"
+					},
+					url: audioURL,
+					duration: 235
+				}]);
+			});
+	};
+	
+	const m83_junk_laser_gun = function() {
+	return fetchYouTubeTrack("eISdgDJMFnA")
+		.then(audioURL => {
 			webamp.appendTracks([{
 				metaData: {
 					artist: "M83",
-					title: "Go! feat Mai Lan"
+					title: "Laser Gun feat. Mai Lan",
+					album: "Junk"
 				},
 				url: audioURL,
-				duration: 235
+				duration: 255
 			}]);
-		}
-		urlReq.send();
-		
-		let url2 = "https://bandcamp-cors-proxy.sydstarwave.workers.dev/?album=97966519";
-		let urlReq2 = new XMLHttpRequest();
-		urlReq2.open('GET', url2, true); 
-		urlReq2.responseType = 'json';
-		urlReq2.onload = function() {
-			let response = urlReq2.response;
-			if (urlReq2.status >= 300) {
-				return;
-			}
-			let tracks = [];
-			for (let i = 0; i < response.tracks.length; i++) {
-				let track = {
-					metaData: {
-						artist: response.tracks[i].artist,
-						title: response.tracks[i].title
-					},
-					url: "https://cors-proxy.sydstarwave.workers.dev/yeet/" + encodeURIComponent(response.tracks[i].file["mp3-128"]),
-					duration: response.tracks[i].duration
-				};
-				if (response.tracks[i].tracknum === 2) {
-					webamp.appendTracks([track]);
-				} else {
-					tracks.push(track);
-				}
-			}
-			webamp.appendTracks(tracks);
-		}
-		urlReq2.send();
-	}
+		});
+	};
 	
+	window.onload = (() => {
+		webamp.renderWhenReady(document.getElementById('webamp'))
+			.then(m83_junk_go)
+			.then(vektroid_floral_shoppe_420)
+			.then(m83_junk_do_it_try_it)
+			.then(startup)
+			.then(m83_junk_laser_gun)
+			.then(radiojpn)
+			.then(danMason);
+	});
   </script>
   </body>
 </html>
